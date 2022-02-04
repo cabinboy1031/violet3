@@ -39,6 +39,8 @@
  * If the render state needs to be modified, these modifications are added to a queue
  * and then applied at the beginning of the next frame.
  *
+ * Data SHALL NOT be modified during the rendering stage to allow for threading.
+ *
  *
  * Loading and rendering stage are part of the same loop,
  * but still are done separately.
@@ -50,18 +52,97 @@
 #include <cstdint>
 #include "raylib.h"
 
-//////////////////////////////////////////////////////////////////////
-// Registry stage functions
-//////////////////////////////////////////////////////////////////////
+typedef uint32_t u32;
 
-//////////////////////////////////////////////////////////////////////
+typedef struct Drawable {
+    // DO NOT CHANGE DIRECTLY
+    int rendererID = 0;
+
+    // FIXME: Modifiable(currently) but should be modified through function.
+    Transform* transform;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// Registry/Cleanup stage functions
+/////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Registers a model.
+ * @param  const char* a registry name for the model
+ * @param  Model a fully loaded model struct to register.
+ * @return uint32_t the models ID in the registry.
+ */
+u32 VGRRegisterModel(const char* registryName , Model model);
+
+/**
+ * Registers a model to a specific ID in the registry.
+ * @param  const char* a registry name for the model
+ * @param  uint32_t a pre_set registryID
+ * @param  Model a fully loaded model struct to register.
+ * @return uint32_t the models ID in the registry.
+ * @error  If a model already has a given ID, throws an error and returns NULL
+ */
+u32 VGRRegisterModel(const char* registryName , u32 rendererID, Model model);
+
+
+/**
+ * Frees the model data and removes the model with the given name
+ * from the registry pool.
+ **/
+void VGRUnloadModel(const char* registryName);
+
+/**
+ * Frees the model data and removes the model with the given RendererID
+ * from the registry pool.
+ **/
+void VGRUnloadModel(u32 rendererID);
+
+/**
+ * Frees ALL model data from the registry and deallocates all memory in the renderer
+ **/
+void VGRCleanupRenderer();
+
+/////////////////////////////////////////////////////////////////////////////////////////
 // Loading stage functions
-//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/**
+ * Tells the renderer to create a new "Drawable" in render state
+ * @param const char* the registry name of the model to draw
+ * @param Transform   the initial location of the model
+ * @return Drawable   the drawable with the render ID and modifiable data
+ **/
+Drawable VGRCreateDrawable(const char* registryName, Tranfsorm transform);
 
+/**
+ * Tells the renderer to create a new "Drawable" in render state
+ * @param uint32_t    the internal model ID
+ * @param Transform   the initial location of the model
+ * @return Drawable   the drawable with the render ID and modifiable data
+ **/
+Drawable VGRCreateDrawable(u32 rendererID, Tranfsorm transform);
 
-//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
 // Rendering stage functions
-//////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Designates the beginning of the render stage
+ * The render state should not change during drawing.
+ **/
+void VGRBeginRendering();
+
+/**
+ * Loops through the entire render state and does a draw call on everything.
+ **/
+void VGRDraw();
+
+/**
+ * Designates the end of the render stage.
+ * Any modifications to render state during the last frame are applied here.
+ **/
+void VGREndRendering();
+
+
+
 
 
 #endif // VIOLET_RENDERING_H
