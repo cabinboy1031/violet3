@@ -54,25 +54,6 @@
 
 typedef uint32_t u32;
 
-struct RegistryEntry {
-    char* modelName;
-    int modelID;
-};
-
-struct ModelPoolData {
-    int modelID;
-    Model data;
-};
-
-typedef struct Renderer {
-    int* modelIDs;
-    Transform* transforms;
-
-    struct RegistryEntry* registry;
-    struct ModelPoolData* modelPool;
-} Renderer;
-
-
 typedef struct Drawable {
     // DO NOT CHANGE DIRECTLY
     int rendererID;
@@ -84,6 +65,12 @@ typedef struct Drawable {
 /////////////////////////////////////////////////////////////////////////////////////////
 // Registry/Cleanup stage functions
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Setup all prerequisite render API calls for the renderer to work.
+ **/
+// Note: Given all this is supposed to be API calls and memory setup, should not be unit tested.
+void VGRSetupRenderer();
 
 /**
  * Registers a model.
