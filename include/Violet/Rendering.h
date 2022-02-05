@@ -1,7 +1,7 @@
 #ifndef VIOLET_RENDERING_H
 #define VIOLET_RENDERING_H
 /**
- * Primary rendering backend.
+ * Primary rendering API.
  *
  * --------------------------
  * Registry Stage
@@ -49,22 +49,42 @@
  * Version: 0.0.1
  **/
 
-#include <cstdint>
+#include <stdint.h>
 #include "raylib.h"
 
 typedef uint32_t u32;
 
+struct RegistryEntry {
+    char* modelName;
+    int modelID;
+};
+
+struct ModelPoolData {
+    int modelID;
+    Model data;
+};
+
+typedef struct Renderer {
+    int* modelIDs;
+    Transform* transforms;
+
+    struct RegistryEntry* registry;
+    struct ModelPoolData* modelPool;
+} Renderer;
+
+
 typedef struct Drawable {
     // DO NOT CHANGE DIRECTLY
-    int rendererID = 0;
+    int rendererID;
 
     // FIXME: Modifiable(currently) but should be modified through function.
     Transform* transform;
-};
+} Drawable;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Registry/Cleanup stage functions
 /////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * Registers a model.
  * @param  const char* a registry name for the model
@@ -81,8 +101,13 @@ u32 VGRRegisterModel(const char* registryName , Model model);
  * @return uint32_t the models ID in the registry.
  * @error  If a model already has a given ID, throws an error and returns NULL
  */
-u32 VGRRegisterModel(const char* registryName , u32 rendererID, Model model);
+u32 VGRRegisterModelWithID(const char* registryName , u32 registryID, Model model);
 
+/**
+ * Gives a id from the registryName
+ * If registryName does not exist, return 0
+ **/
+u32 VGRGetModelID(char* registryName);
 
 /**
  * Frees the model data and removes the model with the given name
@@ -94,7 +119,7 @@ void VGRUnloadModel(const char* registryName);
  * Frees the model data and removes the model with the given RendererID
  * from the registry pool.
  **/
-void VGRUnloadModel(u32 rendererID);
+void VGRUnloadModelByID(u32 rendererID);
 
 /**
  * Frees ALL model data from the registry and deallocates all memory in the renderer
@@ -107,26 +132,51 @@ void VGRCleanupRenderer();
 /**
  * Tells the renderer to create a new "Drawable" in render state
  * @param const char* the registry name of the model to draw
- * @param Transform   the initial location of the model
+ * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawable(const char* registryName, Tranfsorm transform);
+Drawable VGRCreateDrawable(const char* registryName, Transform transform);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state
  * @param uint32_t    the internal model ID
- * @param Transform   the initial location of the model
+ * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawable(u32 rendererID, Tranfsorm transform);
+Drawable VGRCreateDrawableByID(u32 rendererID, Transform transform);
 
+/**
+ * Tells the renderer to create a new "Drawable" in render state
+ * @param Drawable    the drawable to copy from
+ * @param Transform   the initial location of the new drawable
+ * @return Drawable   the drawable with the render ID and modifiable data
+ **/
+Drawable VGRCreateDrawableByCopy(Drawable drawable, Transform transform);
+
+
+/**
+ * Gives the model ID the Drawable is associated with
+ * @param Drawable a valid drawable
+ **/
+u32 VGRGetDrawableModelID(Drawable drawable);
 /////////////////////////////////////////////////////////////////////////////////////////
 // Rendering stage functions
 /////////////////////////////////////////////////////////////////////////////////////////
+/*
+ * REMINDER:
+ * For future me(and other devs)
+ * VGRDraw() should be where all render backend calls should be used.
+ * Otherwise unit testing becomes...wierd.
+ * VGRBeginRendering() and VGREndRendering() are for
+ * Violet code only.
+ *
+ * TODO: find other ways to implement library functions such as Text.
+ **/
 
 /**
  * Designates the beginning of the render stage
  * The render state should not change during drawing.
+ *
  **/
 void VGRBeginRendering();
 

@@ -29,15 +29,26 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 
 endif()
 
+add_subdirectory(lib/Unity-2.5.2/)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(C_STANDARD 11)
+set(C_STANDARD_REQUIRED TRUE)
 
 # This is the main part:
+add_library(${PROJECT_NAME}
+  src/Rendering.c
+  )
 
+target_include_directories(${PROJECT_NAME} PUBLIC include/)
+target_link_libraries(${PROJECT_NAME} raylib)
+
+# Test code that checks if raylib is working properly
 add_executable(raylib_free_cube_test
   test/raylib_free_camera.c
   )
 #set(raylib_VERBOSE 1)
-target_link_libraries(raylib_free_cube_test raylib)
+target_link_libraries(raylib_free_cube_test raylib violet3)
 
 # Checks if OSX and links appropriate frameworks (Only required on MacOS)
 if (APPLE)
@@ -45,5 +56,11 @@ if (APPLE)
     target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
     target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
 endif()
+
+
+add_executable(violet3_test_all
+  test/test_rendering.c
+  )
+target_link_libraries(violet3_test_all violet3 unity)
 
 # That's it! You should have an example executable that you can run. Have fun!
