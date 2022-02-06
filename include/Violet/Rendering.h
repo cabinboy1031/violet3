@@ -179,7 +179,22 @@ void VGRDraw();
 void VGREndRendering();
 
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// Helper functions
+/////////////////////////////////////////////////////////////////////////////////////////
+/*
+* Functions that are helpful but are mostly just passthroughs to other API calls.
+*/
 
+/**
+ * Returns whether or not the window was given a signal to close.
+ **/
+bool VGRWindowShouldClose();
+
+/**
+ * Clears the screen and fills it with the given color.
+ **/
+void VGRClearBackground(Color color);
 
 
 #endif // VIOLET_RENDERING_H

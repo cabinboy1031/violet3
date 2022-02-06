@@ -1,8 +1,10 @@
 /**
  * Author: mysticalCabinboy
  **/
-#include "Violet/Rendering.h"
+
+#include <stdlib.h>
 #include "raylib.h"
+#include "Violet/Rendering.h"
 
 typedef uint32_t u32;
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -23,17 +25,29 @@ typedef struct Renderer {
     Transform* transforms;
 
     struct RegistryEntry* registry;
-    u32 registryLength;
-    struct ModelPoolData* modelPool;
-    u32 modelPoolLength;
-} Renderer;
+    u32 registry_s;
 
-void VGRSetupRenderer(){
-    //TODO: Unimplemented
+    struct ModelPoolData* modelPool;
+    u32 modelPool_s;
+    u32 modelPoolLastID;
+} Renderer;
+static Renderer renderer;
+
+
+void VGRSetupRenderer(int width, int height, const char* title){
+    renderer.modelIDs = 0;
+    renderer.transforms = 0;
+    renderer.registry = 0;
+    renderer.registry_s = 0;
+    renderer.modelPool = 0;
+    renderer.modelPool_s = 0;
+    renderer.modelPoolLastID = 0;
+
+    InitWindow(width, height, title);
 }
 
 u32 VGRRegisterModel(const char* registryName, Model model){
-    //TODO: Unimplemented
+
 }
 
 u32 VGRRegisterModelWithID(const char* registryName, u32 registryID, Model model){
@@ -85,4 +99,12 @@ void VGRDraw(){
 
 void VGREndRendering(){
     //TODO: Unimplemented
+}
+
+bool VGRWindowShouldClose(){
+    return WindowShouldClose();
+}
+
+void VGRClearBackground(Color color){
+    ClearBackground(color);
 }
