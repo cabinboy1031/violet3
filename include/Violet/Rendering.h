@@ -78,7 +78,7 @@ void VGRSetupRenderer();
  * @param  Model a fully loaded model struct to register.
  * @return uint32_t the models ID in the registry.
  */
-u32 VGRRegisterModel(const char* registryName , Model model);
+u32 VGRRegisterModel(char* registryName , Model model);
 
 /**
  * Registers a model to a specific ID in the registry.
@@ -88,7 +88,7 @@ u32 VGRRegisterModel(const char* registryName , Model model);
  * @return uint32_t the models ID in the registry.
  * @error  If a model already has a given ID, throws an error and returns NULL
  */
-u32 VGRRegisterModelWithID(const char* registryName , u32 registryID, Model model);
+u32 VGRRegisterModelWithID(char* registryName , u32 registryID, Model model);
 
 /**
  * Gives a id from the registryName
@@ -96,11 +96,12 @@ u32 VGRRegisterModelWithID(const char* registryName , u32 registryID, Model mode
  **/
 u32 VGRGetModelID(char* registryName);
 
+Model* VGRGetModelByID(u32 modelID);
 /**
  * Frees the model data and removes the model with the given name
  * from the registry pool.
  **/
-void VGRUnloadModel(const char* registryName);
+void VGRUnloadModel(char* registryName);
 
 /**
  * Frees the model data and removes the model with the given RendererID
