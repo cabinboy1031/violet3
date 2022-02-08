@@ -34,10 +34,13 @@ add_subdirectory(lib/Unity-2.5.2/)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(C_STANDARD 11)
 set(C_STANDARD_REQUIRED TRUE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 # This is the main part:
 add_library(${PROJECT_NAME}
   src/Rendering.c
+  src/Rendering/Registry.c
+  src/Rendering/ObjectPool.c
   )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include/)

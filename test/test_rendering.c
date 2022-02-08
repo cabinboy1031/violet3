@@ -19,9 +19,10 @@ void test_UnityIsSetup(void){
 }
 
 void test_RendererRegistersAModel(void){
+    VGRSetupRenderer(0,0,"");
     struct Model testModel;
 
-    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModel("test", testModel));
+    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModel("test", &testModel));
     TEST_ASSERT_EQUAL(1, VGRGetModelID("test"));
 
     VGRUnloadModel("test");
@@ -29,21 +30,23 @@ void test_RendererRegistersAModel(void){
 }
 
 void test_RendererRegistersAModelToASpecificID(void){
+    VGRSetupRenderer(0,0,"");
     struct Model testModel;
 
-    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModelWithID("test",10, testModel));
+    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModelWithID("test",10, &testModel));
     TEST_ASSERT_EQUAL(10, VGRGetModelID("test"));
 
     VGRUnloadModel("test");
 }
 
 void test_RendererCreatesANewDrawable(){
+    VGRSetupRenderer(0,0,"");
     struct Model testModel;
     Transform originPoint;
 
-    VGRRegisterModel("test", testModel);
-    Drawable testDrawable = VGRCreateDrawable("test", originPoint);
-    Drawable testDrawableByID = VGRCreateDrawableByID(VGRGetModelID("test"), originPoint);
+    VGRRegisterModel("test", &testModel);
+    Drawable testDrawable = VGRCreateDrawableByName("test", originPoint);
+    Drawable testDrawableByID = VGRCreateDrawable(VGRGetModelID("test"), originPoint);
     Drawable testDrawableByCopy = VGRCreateDrawableByCopy(testDrawable, originPoint);
 
     TEST_ASSERT_EQUAL(0,testDrawable.rendererID);

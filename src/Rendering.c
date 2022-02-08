@@ -7,32 +7,22 @@
 #include <string.h>
 #include "raylib.h"
 #include "Violet/Rendering.h"
+#include "Violet/Rendering/Registry.h"
+#include "Violet/Rendering/ObjectPool.h"
 
 typedef uint32_t u32;
 /////////////////////////////////////////////////////////////////////////////////////////
 // Renderer structure and data layout
 /////////////////////////////////////////////////////////////////////////////////////////
-struct RegistryEntry {
-    char* modelName;
-    u32 modelID;
-};
-
-struct ModelPoolData {
-    u32 modelID;
-    Model data;
-};
-
 typedef struct Renderer {
     u32* modelID;
     Transform* transforms;
     u32 model_s;
 
-    struct RegistryEntry* registry;
-    u32 registry_s;
+    Registry* registry;
     u32 registryLastID;
 
-    struct ModelPoolData* modelPool;
-    u32 modelPool_s;
+    ObjectPool* modelPool;
 } Renderer;
 
 static Renderer renderer;
@@ -42,128 +32,64 @@ void VGRSetupRenderer(int width, int height, const char* title){
     renderer.transforms = 0;
     renderer.model_s = 0;
 
-    renderer.registry = NULL;
-    renderer.registry_s = 0;
+    renderer.registry = registryAPI.init();
     renderer.registryLastID = 1;
 
-    renderer.modelPool = NULL;
-    renderer.modelPool_s = 0;
+    renderer.modelPool = poolAPI.init(sizeof(Model));
 }
 
-u32 VGRRegisterModel(char* registryName, Model model){
-    if(renderer.registry == NULL){
-        renderer.registry = calloc(1, sizeof(struct RegistryEntry));
-        renderer.registry_s = 0;
-        renderer.registryLastID = 1;
-    }
-
-    // Associate the registry name with its new id
-    struct RegistryEntry newEntry;
-    newEntry.modelName = registryName;
-    newEntry.modelID = renderer.registryLastID;
-
-    renderer.registry[renderer.registry_s] = newEntry;
-    renderer.registry_s++;
+u32 VGRRegisterModel(char* registryName, Model* model){
+    u32 newID = renderer.registryLastID;
     renderer.registryLastID++;
+    // Associate the registry name with its new id
+    // To keep order, ensure it is the largest ID
+    registryAPI.addEntry(renderer.registry, registryName,newID);
 
-    // Load the model into the pool by the given ID.
-    if(renderer.modelPool == NULL){
-        renderer.modelPool = malloc(sizeof(struct ModelPoolData));
-        renderer.modelPool_s = 0;
-    }
-    struct ModelPoolData newModel;
-    newModel.modelID = newEntry.modelID;
-    newModel.data = model;
-    renderer.modelPool[renderer.modelPool_s] = newModel;
-    renderer.modelPool_s++;
+    poolAPI.addObject(renderer.modelPool, newID, model);
 
-    return newModel.modelID;
+    return newID;
 }
 
-u32 VGRRegisterModelWithID(char* registryName, u32 registryID, Model model){
-    if(renderer.registry == NULL){
-        renderer.registry = calloc(1, sizeof(struct RegistryEntry));
-        renderer.registry_s = 0;
-        renderer.registryLastID = 1;
-    }
-
+u32 VGRRegisterModelWithID(char* registryName, u32 registryID, Model* model){
     if(VGRGetModelByID(registryID)){
         printf("Error!: Attempt to register two models by the same id!\n New model registry name: %s\nModelID: %s", registryName, registryID);
     }
+    registryAPI.addEntry(renderer.registry, registryName,registryID);
+    poolAPI.addObject(renderer.modelPool,registryID, model);
 
-    // Associate the registry name with its new id
-    struct RegistryEntry newEntry;
-    newEntry.modelName = registryName;
-    newEntry.modelID = registryID;
-
-
-    renderer.registry[renderer.registry_s] = newEntry;
-    renderer.registry_s++;
-
-    // Load the model into the pool by the given ID.
-    if(renderer.modelPool == NULL){
-        renderer.modelPool = malloc(sizeof(struct ModelPoolData));
-        renderer.modelPool_s = 0;
-    }
-    struct ModelPoolData newModel;
-    newModel.modelID = newEntry.modelID;
-    newModel.data = model;
-    renderer.modelPool[renderer.modelPool_s] = newModel;
-    renderer.modelPool_s++;
-
-    return newModel.modelID;
+    return registryID;
 }
 
 u32 VGRGetModelID(char* registryName){
-    for(int i = 0; i < renderer.registry_s; i++){
-        if(strcmp(renderer.registry[i].modelName,registryName)== 0){
-            return renderer.registry[i].modelID;
-        }
-    }
-    printf("Error: %s not found in registry!", registryName);
-    return 0;
+    return registryAPI.getEntry(renderer.registry,registryName);
 }
 
 Model* VGRGetModelByID(u32 modelID){
-        for(int i = 0; i < renderer.registry_s; i++){
-            if(renderer.modelPool[i].modelID == modelID){
-                return &renderer.modelPool[i].data;
-            }
-        }
-        return NULL;
+    poolAPI.get(renderer.modelPool, modelID);
 }
 
 void VGRUnloadModel(char* registryName){
     u32 modelID = VGRGetModelID(registryName);
     if(modelID != 0){
-        for(int i = 0; i < renderer.registry_s; i++){
-            if(strcmp(renderer.registry[i].modelName,registryName)== 0){
-                renderer.registry[i].modelID = 0;
-            }
-        }
+        registryAPI.deleteEntry(renderer.registry, registryName);
 
-        for(int i = 0; i < renderer.registry_s; i++){
-            if(renderer.modelPool[i].modelID == modelID){
-                renderer.modelPool[i].modelID = 0;
-            }
-        }
+        poolAPI.removeObject(renderer.modelPool, modelID);
     }
 }
 
 void VGRUnloadModelByID(u32 rendererID){
     //TODO: Unimplemented
-
 }
 
 void VGRCleanupRenderer(){
     //TODO: Unimplemented
 }
 
-Drawable VGRCreateDrawable(const char* registryname, Transform transform){
+Drawable VGRCreateDrawableByName(const char* registryname, Transform transform){
     //TODO: Unimplemented
 }
 
-Drawable VGRCreateDrawableByID(u32 rendererID, Transform transform){
+Drawable VGRCreateDrawable(u32 rendererID, Transform transform){
     //TODO: Unimplemented
 }
 

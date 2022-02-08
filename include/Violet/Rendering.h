@@ -78,7 +78,7 @@ void VGRSetupRenderer();
  * @param  Model a fully loaded model struct to register.
  * @return uint32_t the models ID in the registry.
  */
-u32 VGRRegisterModel(char* registryName , Model model);
+u32 VGRRegisterModel(char* registryName , Model* model);
 
 /**
  * Registers a model to a specific ID in the registry.
@@ -88,7 +88,7 @@ u32 VGRRegisterModel(char* registryName , Model model);
  * @return uint32_t the models ID in the registry.
  * @error  If a model already has a given ID, throws an error and returns NULL
  */
-u32 VGRRegisterModelWithID(char* registryName , u32 registryID, Model model);
+u32 VGRRegisterModelWithID(char* registryName , u32 registryID, Model* model);
 
 /**
  * Gives a id from the registryName
@@ -123,7 +123,7 @@ void VGRCleanupRenderer();
  * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawable(const char* registryName, Transform transform);
+Drawable VGRCreateDrawableByName(const char* registryName, Transform transform);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state
@@ -131,7 +131,7 @@ Drawable VGRCreateDrawable(const char* registryName, Transform transform);
  * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawableByID(u32 rendererID, Transform transform);
+Drawable VGRCreateDrawable(u32 rendererID, Transform transform);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state
