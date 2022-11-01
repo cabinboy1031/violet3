@@ -1,3 +1,6 @@
 [submodule "lib/Unity"]
 	path = lib/Unity
 	url = git@github.com:ThrowTheSwitch/Unity.git
+[submodule "lib/flecs"]
+	path = lib/flecs
+	url = git@github.com:SanderMertens/flecs.git
