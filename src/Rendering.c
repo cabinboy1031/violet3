@@ -6,9 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "raylib.h"
+
 #include "Violet/Rendering.h"
 #include "Violet/Rendering/Registry.h"
-#include "Violet/Rendering/ObjectPool.h"
+#include "Violet/Rendering/EntityPool.h"
+
 
 typedef uint32_t u32;
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -22,7 +24,7 @@ typedef struct Renderer {
     Registry* registry;
     u32 registryLastID;
 
-    ObjectPool* modelPool;
+    EntityPool* modelPool;
 } Renderer;
 
 static Renderer renderer;
@@ -52,7 +54,7 @@ u32 VGRRegisterModel(char* registryName, Model* model){
 
 u32 VGRRegisterModelWithID(char* registryName, u32 registryID, Model* model){
     if(VGRGetModelByID(registryID)){
-        printf("Error!: Attempt to register two models by the same id!\n New model registry name: %s\nModelID: %s", registryName, registryID);
+        printf("Error!: Attempt to register two models by the same id!\n New model registry name: %s\nModelID: %d", registryName, registryID);
     }
     registryAPI.addEntry(renderer.registry, registryName,registryID);
     poolAPI.addObject(renderer.modelPool,registryID, model);
@@ -65,40 +67,43 @@ u32 VGRGetModelID(char* registryName){
 }
 
 Model* VGRGetModelByID(u32 modelID){
-    poolAPI.get(renderer.modelPool, modelID);
+    return poolAPI.get(renderer.modelPool, modelID);
 }
 
 void VGRUnloadModel(char* registryName){
     u32 modelID = VGRGetModelID(registryName);
     if(modelID != 0){
         registryAPI.deleteEntry(renderer.registry, registryName);
-
         poolAPI.removeObject(renderer.modelPool, modelID);
     }
 }
 
-void VGRUnloadModelByID(u32 rendererID){
-    //TODO: Unimplemented
-}
-
 void VGRCleanupRenderer(){
-    //TODO: Unimplemented
+    registryAPI.delete(renderer.registry);
+    poolAPI.destroy(renderer.modelPool);
+
+    free(renderer.modelID);
+    free(renderer.transforms);
 }
 
-Drawable VGRCreateDrawableByName(const char* registryname, Transform transform){
+Drawable VGRCreateDrawableByName(char* registryname, Transform transform){
     //TODO: Unimplemented
+    return (Drawable){};
 }
 
 Drawable VGRCreateDrawable(u32 rendererID, Transform transform){
     //TODO: Unimplemented
+    return (Drawable){};
 }
 
 Drawable VGRCreateDrawableByCopy(Drawable drawable, Transform transform){
     //TODO: Unimplemented
+    return (Drawable){};
 }
 
 u32 VGRGetDrawableModelID(Drawable drawable){
     //TODO: Unimplemented
+    return 0;
 }
 
 void VGRBeginRendering(){

@@ -58,7 +58,7 @@ typedef struct Drawable {
     // DO NOT CHANGE DIRECTLY
     int rendererID;
 
-    // FIXME: Modifiable(currently) but should be modified through function.
+    // TODO: Modifiable(currently) but should be modified through function.
     Transform* transform;
 } Drawable;
 
@@ -104,12 +104,6 @@ Model* VGRGetModelByID(u32 modelID);
 void VGRUnloadModel(char* registryName);
 
 /**
- * Frees the model data and removes the model with the given RendererID
- * from the registry pool.
- **/
-void VGRUnloadModelByID(u32 rendererID);
-
-/**
  * Frees ALL model data from the registry and deallocates all memory in the renderer
  **/
 void VGRCleanupRenderer();
@@ -123,7 +117,7 @@ void VGRCleanupRenderer();
  * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawableByName(const char* registryName, Transform transform);
+Drawable VGRCreateDrawableByName(char* registryName, Transform transform);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state

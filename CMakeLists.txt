@@ -1,4 +1,3 @@
-
 cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
 project(violet3)
 
@@ -29,21 +28,21 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 
 endif()
 
-add_subdirectory(lib/Unity-2.5.2/)
+add_subdirectory(lib/Unity-2.5.2/) # testing framework
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(C_STANDARD 11)
-set(C_STANDARD_REQUIRED TRUE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
+
+file(GLOB_RECURSE SOURCES src/*.c)
+set(HEADERS
+  include/
+  lib/C-Macro-Collections/src)
 
 # This is the main part:
-add_library(${PROJECT_NAME}
-  src/Rendering.c
-  src/Rendering/Registry.c
-  src/Rendering/ObjectPool.c
-  )
-
-target_include_directories(${PROJECT_NAME} PUBLIC include/)
+add_library(${PROJECT_NAME} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${HEADERS})
 target_link_libraries(${PROJECT_NAME} raylib)
 
 # Test code that checks if raylib is working properly
@@ -65,5 +64,10 @@ add_executable(violet3_test_all
   test/test_rendering.c
   )
 target_link_libraries(violet3_test_all violet3 unity)
+
+add_executable(violet3_test_application
+  test/test_application.c)
+target_link_libraries(violet3_test_application violet3 unity)
+target_include_directories(violet3_test_application PUBLIC include/)
 
 # That's it! You should have an example executable that you can run. Have fun!
