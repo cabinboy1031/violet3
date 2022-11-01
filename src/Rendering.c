@@ -9,7 +9,6 @@
 
 #include "Violet/Rendering.h"
 #include "Violet/Rendering/Registry.h"
-#include "Violet/Rendering/EntityPool.h"
 
 
 typedef uint32_t u32;
@@ -24,7 +23,7 @@ typedef struct Renderer {
     Registry* registry;
     u32 registryLastID;
 
-    EntityPool* modelPool;
+    struct ModelList* modelPool;
 } Renderer;
 
 static Renderer renderer;
@@ -36,8 +35,6 @@ void VGRSetupRenderer(int width, int height, const char* title){
 
     renderer.registry = registryAPI.init();
     renderer.registryLastID = 1;
-
-    renderer.modelPool = poolAPI.init(sizeof(Model));
 }
 
 u32 VGRRegisterModel(char* registryName, Model* model){
@@ -47,8 +44,6 @@ u32 VGRRegisterModel(char* registryName, Model* model){
     // To keep order, ensure it is the largest ID
     registryAPI.addEntry(renderer.registry, registryName,newID);
 
-    poolAPI.addObject(renderer.modelPool, newID, model);
-
     return newID;
 }
 
@@ -57,7 +52,6 @@ u32 VGRRegisterModelWithID(char* registryName, u32 registryID, Model* model){
         printf("Error!: Attempt to register two models by the same id!\n New model registry name: %s\nModelID: %d", registryName, registryID);
     }
     registryAPI.addEntry(renderer.registry, registryName,registryID);
-    poolAPI.addObject(renderer.modelPool,registryID, model);
 
     return registryID;
 }
@@ -67,20 +61,17 @@ u32 VGRGetModelID(char* registryName){
 }
 
 Model* VGRGetModelByID(u32 modelID){
-    return poolAPI.get(renderer.modelPool, modelID);
 }
 
 void VGRUnloadModel(char* registryName){
     u32 modelID = VGRGetModelID(registryName);
     if(modelID != 0){
         registryAPI.deleteEntry(renderer.registry, registryName);
-        poolAPI.removeObject(renderer.modelPool, modelID);
     }
 }
 
 void VGRCleanupRenderer(){
     registryAPI.delete(renderer.registry);
-    poolAPI.destroy(renderer.modelPool);
 
     free(renderer.modelID);
     free(renderer.transforms);

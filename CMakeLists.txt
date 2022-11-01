@@ -29,6 +29,7 @@ if (NOT raylib_FOUND) # If there's none, fetch and build raylib
 endif()
 
 add_subdirectory(lib/Unity-2.5.2/) # testing framework
+add_subdirectory(lib/flecs) # entity component system
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 17)
@@ -43,7 +44,7 @@ set(HEADERS
 # This is the main part:
 add_library(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${HEADERS})
-target_link_libraries(${PROJECT_NAME} raylib)
+target_link_libraries(${PROJECT_NAME} raylib flecs)
 
 # Test code that checks if raylib is working properly
 add_executable(raylib_free_cube_test
