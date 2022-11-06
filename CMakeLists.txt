@@ -34,7 +34,7 @@ add_subdirectory(lib/flecs) # entity component system
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pg")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3 -pg")
 
 file(GLOB_RECURSE SOURCES src/*.c)
 set(HEADERS

@@ -13,6 +13,5 @@ void test_UnityIsSetup(void){
 
 UNITY_BEGIN()
 void main(){
-    RUN_TEST(tes)
 }
 UNITY_END()

@@ -9,15 +9,12 @@
 #include "raylib.h"
 
 #include "Violet/Rendering.h"
-#include "utl_futils.h"
+#include "Violet/Rendering/Registry.h"
 
 #define MODEL_LIST_PARAMS (mlist,ModelList,,,Model)
 C_MACRO_COLLECTIONS_EXTENDED(CMC, LIST, MODEL_LIST_PARAMS, (STR));
 #define RENDER_POOL_PARAMS (dlist,DrawableList,,,Drawable)
 C_MACRO_COLLECTIONS_EXTENDED(CMC, LIST, RENDER_POOL_PARAMS, (STR));
-
-#define REGISTRY_MAP_PARAMS (mreg,ModelRegistry, , char*, u32)
-C_MACRO_COLLECTIONS_EXTENDED(CMC, HASHMAP, REGISTRY_MAP_PARAMS, (STR));
 
 typedef uint32_t u32;
 
@@ -37,10 +34,10 @@ typedef struct Renderer {
 static Renderer renderer;
 
 void VGRSetup(int width, int height, const char* title){
-    renderer.data = dlist_new(2, 
+    renderer.data = dlist_new(1, 
     &(struct DrawableList_fval){
     });
-
+    
     renderer.registry = registryAPI.init();
     renderer.registryLastID = 1;
     
@@ -82,9 +79,12 @@ void VGRUnloadModel(char* registryName){
     }
 }
 
-void VGRCleanupRenderer(){
+void VGRCleanup(){
     registryAPI.delete(renderer.registry);
 
+    for(int i = 0; i < dlist_capacity(renderer.data); i++){
+        dlist_pop_back(renderer.data);
+    }
     dlist_free(renderer.data);
     mlist_free(renderer.modelPool);
 }
@@ -94,7 +94,7 @@ void VGRSetDrawFunc(Drawable drawable, void (*drawFunc)(Transform)){
 }
 
 Drawable VGRCreateDrawableByName(char* registryname){
-    u32 id = registry.getEntry(registryname);
+    u32 id = registryAPI.getEntry(renderer.registry,registryname);
     return VGRCreateDrawable(id);
 }
 

@@ -11,10 +11,6 @@ static Registry* init(){
 }
 
 static void delete(Registry* registry){
-    for(size_t i = 0; i < registry->size; i++){
-        free(registry->data[i].name);
-        registry->data[i].id = 0;
-    }
     free(registry);
     registry = 0;
 }
