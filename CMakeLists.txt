@@ -62,13 +62,7 @@ endif()
 
 
 add_executable(violet3_test_all
-  test/test_rendering.c
+  test/test_all.c
   )
 target_link_libraries(violet3_test_all violet3 unity)
 
-add_executable(violet3_test_application
-  test/test_application.c)
-target_link_libraries(violet3_test_application violet3 unity)
-target_include_directories(violet3_test_application PUBLIC include/)
-
-# That's it! You should have an example executable that you can run. Have fun!

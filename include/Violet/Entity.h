@@ -3,10 +3,8 @@
 #include <flecs.h>
 #include <raylib.h>
 
-// the global entity system
-ecs_world_t *globalVioletEntitySystem;
-
-ecs_world_t *VECSInit();
+ecs_world_t* VECSInit();
+ecs_world_t* VECSGetWorld();
 void VECSDestruct();
 
 #endif

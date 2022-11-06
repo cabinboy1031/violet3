@@ -7,11 +7,12 @@ void tearDown(void){
 
 }
 
-void test_UnityIsSetup(void){
+void test_UnityIsSetup(){
     TEST_ASSERT_EQUAL(10,10);
 }
 
-UNITY_BEGIN()
 void main(){
+UNITY_BEGIN();
+    RUN_TEST(test_UnityIsSetup);
+UNITY_END();
 }
-UNITY_END()
