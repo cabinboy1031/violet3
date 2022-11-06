@@ -7,6 +7,7 @@
 
 #include "unity.h"
 #include "Violet/Rendering.h"
+#include <raylib.h>
 
 void setUp(void){
 }
@@ -19,48 +20,51 @@ void test_UnityIsSetup(void){
 }
 
 void test_RendererRegistersAModel(void){
-    VGRSetupRenderer(0,0,"");
+    VGRSetup(0,0,"");
     struct Model testModel;
 
-    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModel("test", &testModel));
-    TEST_ASSERT_EQUAL(1, VGRGetModelID("test"));
+    u32 modelID = VGRRegisterModel("test", &testModel);
+
+    TEST_ASSERT_NOT_EQUAL_MESSAGE(0, modelID, "Model does not have an ID.");
+    TEST_ASSERT_EQUAL_MESSAGE(1, VGRGetModelID("test"), "Model might not be registered.");
 
     VGRUnloadModel("test");
     TEST_ASSERT_EQUAL(0, VGRGetModelID("test"));
 }
 
 void test_RendererRegistersAModelToASpecificID(void){
-    VGRSetupRenderer(0,0,"");
+    VGRSetup(0,0,"");
     struct Model testModel;
+    u32 modelID = VGRRegisterModelWithID("test", 10, &testModel);
 
-    TEST_ASSERT_NOT_EQUAL(0, VGRRegisterModelWithID("test",10, &testModel));
     TEST_ASSERT_EQUAL(10, VGRGetModelID("test"));
 
     VGRUnloadModel("test");
 }
 
 void test_RendererCreatesANewDrawable(){
-    VGRSetupRenderer(0,0,"");
+    VGRSetup(0,0,"");
     struct Model testModel;
     Transform originPoint;
 
     VGRRegisterModel("test", &testModel);
-    Drawable testDrawable = VGRCreateDrawableByName("test", originPoint);
-    Drawable testDrawableByID = VGRCreateDrawable(VGRGetModelID("test"), originPoint);
-    Drawable testDrawableByCopy = VGRCreateDrawableByCopy(testDrawable, originPoint);
+    VGRRegisterModel("test2", &testModel);
 
-    TEST_ASSERT_EQUAL(0,testDrawable.rendererID);
+    Drawable testDrawable = VGRCreateDrawableByName("test");
+    Drawable testDrawableByID = VGRCreateDrawable(VGRGetModelID("test"));
+    Drawable testDrawableByCopy = VGRCreateDrawableByCopy(testDrawable);
+    
+    
+    Drawable testUniqueDrawableByID = VGRCreateDrawable(VGRGetModelID("test2"));
+
+    TEST_ASSERT_EQUAL(1,testDrawable.modelID);
     TEST_ASSERT_EQUAL(VGRGetModelID("test"), VGRGetDrawableModelID(testDrawable));
-
-    TEST_ASSERT_EQUAL(1,testDrawableByID.rendererID);
     TEST_ASSERT_EQUAL(VGRGetModelID("test"), VGRGetDrawableModelID(testDrawableByID));
-    TEST_ASSERT_NOT_EQUAL(testDrawable.transform,testDrawableByID.transform);
-
-    TEST_ASSERT_EQUAL(2,testDrawableByCopy.rendererID);
     TEST_ASSERT_EQUAL(VGRGetModelID("test"), VGRGetDrawableModelID(testDrawableByCopy));
-    TEST_ASSERT_NOT_EQUAL(testDrawable.transform,testDrawableByCopy.transform);
+    
+    TEST_ASSERT_NOT_EQUAL(VGRGetModelID("test2"), VGRGetModelID("test"));
 
-    VGRCleanupRenderer();
+    VGRCleanup();
 }
 
 void main(){

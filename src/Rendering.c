@@ -5,20 +5,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <macro_collections.h>
 #include "raylib.h"
 
 #include "Violet/Rendering.h"
-#include "Violet/Rendering/Registry.h"
+#include "utl_futils.h"
 
+#define MODEL_LIST_PARAMS (mlist,ModelList,,,Model)
+C_MACRO_COLLECTIONS_EXTENDED(CMC, LIST, MODEL_LIST_PARAMS, (STR));
+#define RENDER_POOL_PARAMS (dlist,DrawableList,,,Drawable)
+C_MACRO_COLLECTIONS_EXTENDED(CMC, LIST, RENDER_POOL_PARAMS, (STR));
+
+#define REGISTRY_MAP_PARAMS (mreg,ModelRegistry, , char*, u32)
+C_MACRO_COLLECTIONS_EXTENDED(CMC, HASHMAP, REGISTRY_MAP_PARAMS, (STR));
 
 typedef uint32_t u32;
+
+Drawable defaultDrawable;
 /////////////////////////////////////////////////////////////////////////////////////////
 // Renderer structure and data layout
 /////////////////////////////////////////////////////////////////////////////////////////
 typedef struct Renderer {
-    u32* modelID;
-    Transform* transforms;
-    u32 model_s;
+    struct DrawableList* data;
 
     Registry* registry;
     u32 registryLastID;
@@ -28,13 +36,16 @@ typedef struct Renderer {
 
 static Renderer renderer;
 
-void VGRSetupRenderer(int width, int height, const char* title){
-    renderer.modelID = NULL;
-    renderer.transforms = 0;
-    renderer.model_s = 0;
+void VGRSetup(int width, int height, const char* title){
+    renderer.data = dlist_new(2, 
+    &(struct DrawableList_fval){
+    });
 
     renderer.registry = registryAPI.init();
     renderer.registryLastID = 1;
+    
+    renderer.modelPool = mlist_new(1, 
+    &(struct ModelList_fval){});
 }
 
 u32 VGRRegisterModel(char* registryName, Model* model){
@@ -61,6 +72,7 @@ u32 VGRGetModelID(char* registryName){
 }
 
 Model* VGRGetModelByID(u32 modelID){
+    return mlist_get_ref(renderer.modelPool, modelID);
 }
 
 void VGRUnloadModel(char* registryName){
@@ -73,28 +85,31 @@ void VGRUnloadModel(char* registryName){
 void VGRCleanupRenderer(){
     registryAPI.delete(renderer.registry);
 
-    free(renderer.modelID);
-    free(renderer.transforms);
+    dlist_free(renderer.data);
+    mlist_free(renderer.modelPool);
 }
 
-Drawable VGRCreateDrawableByName(char* registryname, Transform transform){
-    //TODO: Unimplemented
-    return (Drawable){};
+void VGRSetDrawFunc(Drawable drawable, void (*drawFunc)(Transform)){
+    drawable.drawFunc = drawFunc;    
 }
 
-Drawable VGRCreateDrawable(u32 rendererID, Transform transform){
-    //TODO: Unimplemented
-    return (Drawable){};
+Drawable VGRCreateDrawableByName(char* registryname){
+    u32 id = registry.getEntry(registryname);
+    return VGRCreateDrawable(id);
 }
 
-Drawable VGRCreateDrawableByCopy(Drawable drawable, Transform transform){
-    //TODO: Unimplemented
-    return (Drawable){};
+Drawable VGRCreateDrawable(u32 rendererID){
+    Drawable newDrawable = (Drawable){.modelID = rendererID, .drawFunc = defaultDrawable.drawFunc};
+    dlist_push_back(renderer.data, newDrawable);
+    return newDrawable;
+}
+
+Drawable VGRCreateDrawableByCopy(Drawable drawable){
+    return (Drawable){.modelID = drawable.modelID, .drawFunc = drawable.drawFunc};
 }
 
 u32 VGRGetDrawableModelID(Drawable drawable){
-    //TODO: Unimplemented
-    return 0;
+    return drawable.modelID;
 }
 
 void VGRBeginRendering(){

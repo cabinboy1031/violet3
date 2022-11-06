@@ -54,13 +54,15 @@
 
 typedef uint32_t u32;
 
+/**
+ * @brief The drawable component. Made to be used by FLECS.
+ */
+// DO NOT MODIFY DIRECTLY
 typedef struct Drawable {
-    // DO NOT CHANGE DIRECTLY
-    int rendererID;
-
-    // TODO: Modifiable(currently) but should be modified through function.
-    Transform* transform;
+    u32 modelID;
+    void (*drawFunc)(Transform);
 } Drawable;
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Registry/Cleanup stage functions
@@ -70,7 +72,7 @@ typedef struct Drawable {
  * Setup all prerequisite render API calls for the renderer to work.
  **/
 // Note: Given all this is supposed to be API calls and memory setup, should not be unit tested.
-void VGRSetupRenderer();
+void VGRSetup();
 
 /**
  * Registers a model.
@@ -106,34 +108,48 @@ void VGRUnloadModel(char* registryName);
 /**
  * Frees ALL model data from the registry and deallocates all memory in the renderer
  **/
-void VGRCleanupRenderer();
+void VGRCleanup();
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // Loading stage functions
 /////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Enables a programmer to set a general draw function for a library.
+ * 
+ * @param drawFunc a user-defined function which takes a Transform
+ */
+void VGRSetDefaultDrawFunc(void (*drawFunc)(Transform));
+
+/**
+ * @brief Gives a drawfunc to the specific drawable, 
+* this allows certain models to be drawn in different ways on the screen.
+ * 
+ * @param drawable the drawable you wish to give the specific function
+ * @param drawFunc a user-defined function which takes a Transform
+ */
+void VGRSetDrawFunc(Drawable drawable, void (*drawFunc)(Transform));
+
 /**
  * Tells the renderer to create a new "Drawable" in render state
  * @param const char* the registry name of the model to draw
- * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawableByName(char* registryName, Transform transform);
+Drawable VGRCreateDrawableByName(char* registryName);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state
  * @param uint32_t    the internal model ID
- * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawable(u32 rendererID, Transform transform);
+Drawable VGRCreateDrawable(u32 modelID);
 
 /**
  * Tells the renderer to create a new "Drawable" in render state
  * @param Drawable    the drawable to copy from
- * @param Transform   the initial location of the new drawable
  * @return Drawable   the drawable with the render ID and modifiable data
  **/
-Drawable VGRCreateDrawableByCopy(Drawable drawable, Transform transform);
+Drawable VGRCreateDrawableByCopy(Drawable drawable);
 
 
 /**
