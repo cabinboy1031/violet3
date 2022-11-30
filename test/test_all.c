@@ -11,7 +11,7 @@ void test_UnityIsSetup(){
     TEST_ASSERT_EQUAL(10,10);
 }
 
-void main(){
+int main(){
 UNITY_BEGIN();
     RUN_TEST(test_UnityIsSetup);
 UNITY_END();

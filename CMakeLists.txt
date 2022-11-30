@@ -39,7 +39,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ggdb3 -pg")
 file(GLOB_RECURSE SOURCES src/*.c)
 set(HEADERS
   include/
-  lib/C-Macro-Collections/src)
+  lib/C-Macro-Collections/src
+  lib/flecs/include/)
 
 # This is the main part:
 add_library(${PROJECT_NAME} ${SOURCES})
@@ -65,4 +66,9 @@ add_executable(violet3_test_all
   test/test_all.c
   )
 target_link_libraries(violet3_test_all violet3 unity)
+
+add_executable(violet3_test_application
+  test/test_application.c
+  )
+target_link_libraries(violet3_test_application violet3 unity)
 
