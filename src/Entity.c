@@ -16,9 +16,6 @@ ecs_world_t* VECSInit(){
     
     
     ecs_entity_t VECSUpdate = ecs_new_w_id(world,EcsPhase);
-
-    ECS_TAG(world, VECSEntityTick);
-    ECS_ENTITY(world, TickEntity, VECSEntityTick);
     
     return globalVioletEntitySystem;
 }
@@ -31,13 +28,21 @@ void VECSDestruct(){
     ecs_fini(globalVioletEntitySystem);
 }
 
-ecs_entity_t VECSCreateEntity(){
+ecs_entity_t VECSCreateEntity(Transform default_transform){
     ecs_entity_t e = ecs_new_id(globalVioletEntitySystem); 
 
     // The only required component in the entire engine.
     // Other components should be added to the entity
     ECS_COMPONENT(globalVioletEntitySystem, Transform);
-    ecs_add(globalVioletEntitySystem, e, Transform);
+    ecs_set(globalVioletEntitySystem,e,
+        Transform,{
+            .translation = default_transform.translation, 
+            .rotation = default_transform.rotation, 
+            .scale = default_transform.scale});
     
     return e;
+}
+
+bool VECSProgress(bool runCondition){
+    return ecs_progress(VECSGetWorld(), 0) && runCondition;
 }
