@@ -72,3 +72,7 @@ add_executable(violet3_test_application
   )
 target_link_libraries(violet3_test_application violet3 unity)
 
+file(GLOB_RECURSE CHESS_SRC test/Chess/*.c)
+file(GLOB_RECURSE CHESS_HEAD test/Chess/*.h)
+add_executable(violet3_chess ${CHESS_SRC})
+target_link_libraries(violet3_chess violet3 unity)
