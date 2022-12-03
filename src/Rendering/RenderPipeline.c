@@ -33,8 +33,8 @@ void VERPSetup(){
     ecs_entity_t VERPPostDraw = ecs_new_w_id(world, EcsPhase);
 
 
-    ECS_ENTITY(world, VECSUpdate, EcsPhase);
-    ecs_add_pair(world, VERPBeginDraw, EcsDependsOn, VECSUpdate);
+    ECS_ENTITY(world, VECSPostUpdate, EcsPhase);
+    ecs_add_pair(world, VERPBeginDraw, EcsDependsOn, VECSPostUpdate);
     ecs_add_pair(world, VERPOnDraw, EcsDependsOn, VERPBeginDraw);
     ecs_add_pair(world, VERPPostDraw, EcsDependsOn, VERPOnDraw);
     

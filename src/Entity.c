@@ -15,7 +15,11 @@ ecs_world_t* VECSInit(){
     // Then the user can add whatever stage they wish through their setup function.
     
     
+    ecs_entity_t VECSPreUpdate = ecs_new_w_id(world,EcsPhase);
     ecs_entity_t VECSUpdate = ecs_new_w_id(world,EcsPhase);
+    ecs_entity_t VECSPostUpdate = ecs_new_w_id(world,EcsPhase);
+    ecs_add_pair(world, VECSUpdate, EcsDependsOn, VECSPreUpdate);
+    ecs_add_pair(world, VECSPostUpdate, EcsDependsOn, VECSUpdate);
     
     return globalVioletEntitySystem;
 }
