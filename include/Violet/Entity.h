@@ -3,6 +3,8 @@
 #include <flecs.h>
 #include <raylib.h>
 
+#define VECS_FIELD(it, type, var, idx) type *var = ecs_field(it, type, idx)
+
 /**
  * @brief Initialize the component system
  * This should ALWAYS be done first.
