@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include "grid.h"
 #include "snake.h"
+#include "apple.h"
 
 
 int main(){
@@ -21,6 +22,8 @@ int main(){
             {},
             {1,1}
         });
+    
+    apple_InitializeSystems();
 
     // Run the program
     while(VECSProgress(!WindowShouldClose()));
