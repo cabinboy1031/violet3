@@ -4,6 +4,7 @@
 
 #include "flecs.h"
 #include "Violet/Entity.h"
+#include "Violet/Input.h"
 #include <raylib.h>
 #include "grid.h"
 
@@ -51,7 +52,7 @@ void snake_InitializeSystems(){
     });
 }
 
-void snake_CreateSnakeHead(Transform transform){
+ecs_entity_t snake_CreateSnakeHead(Transform transform){
     ecs_world_t *world = VECSGetWorld();
     COMPONENTS(world);
 
@@ -64,6 +65,8 @@ void snake_CreateSnakeHead(Transform transform){
     ecs_set(world,snake,SnakeTile,{
             snake,0
         });
+    
+    return snake;
 }
 
 void SpawnSnakeTail(ecs_iter_t *it){

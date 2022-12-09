@@ -9,7 +9,7 @@ typedef struct SnakeTile {
 } SnakeTile;
 
 void snake_InitializeSystems();
-void snake_CreateSnakeHead(Transform);
+ecs_entity_t snake_CreateSnakeHead(Transform);
 
 void MoveSnake(ecs_iter_t*);
 void ChangeSnakeDirection(ecs_iter_t*);
